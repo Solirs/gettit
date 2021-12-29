@@ -26,9 +26,9 @@ var videofile string
 
 var audiofile string
 
-var Red = "\033[31m"
+var red = "\033[31m"
 
-var Green = "\033[32m"
+/*var Green = "\033[32m"
 
 var Yellow = "\033[33m"
 
@@ -38,9 +38,9 @@ var Purple = "\033[35m"
 
 var Cyan = "\033[36m"
 
-var White = "\033[37m"
+var White = "\033[37m"*/
 
-var Reset = "\033[0m"
+var reset = "\033[0m"
 
 func initflags() {
 	flag.StringVar(&url, "u", "NONE", "Url of the post")
@@ -78,7 +78,7 @@ func main() {
 	correcturl()
 
 	if url == "NONE" {
-		log.Fatal(Red, "No post URL specified. Quitting.", Reset)
+		log.Fatal(red, "No post URL specified. Quitting.", reset)
 
 	}
 
