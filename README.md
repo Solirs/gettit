@@ -13,7 +13,8 @@ Example :
 Will download this meme in the current working directory as out.mp4
 
 
-Dependencies :
+# Requirements :
 
-ffmpeg
+ffmpeg (obligatory)
 
+go (to build from source)
