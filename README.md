@@ -13,5 +13,7 @@ Example :
 Will download this meme in the current working directory as out.mp4
 
 
+Dependencies :
 
+ffmpeg
 
