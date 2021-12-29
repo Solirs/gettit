@@ -26,11 +26,15 @@ var videofile string
 
 var audiofile string
 
+var outfile string
+
 var red = "\033[31m"
 
-/*var Green = "\033[32m"
+var reset = "\033[0m"
 
-var Yellow = "\033[33m"
+var green = "\033[32m"
+
+/*var Yellow = "\033[33m"
 
 var Blue = "\033[34m"
 
@@ -40,9 +44,8 @@ var Cyan = "\033[36m"
 
 var White = "\033[37m"*/
 
-var reset = "\033[0m"
-
 func initflags() {
+	flag.StringVar(&outfile, "o", "out.mp4", "Output file")
 	flag.StringVar(&url, "u", "NONE", "Url of the post")
 	flag.BoolVar(&noclean, "noclean", false, "Don't remove separate audio and video files after merging them")
 	flag.Parse()
@@ -88,7 +91,7 @@ func main() {
 
 	checkerror(err)
 
-	req.Header.Set("User-Agent", "Mozilla/5.0")
+	req.Header.Set("User-Agent", "Mozilla/5.0") //We need a semi-credible user agent or else reddit will just block the request
 
 	resp, err := new(http.Client).Do(req)
 
@@ -124,7 +127,7 @@ func main() {
 
 	fmt.Println("Merging audio and video...")
 
-	args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", "out.mp4"}
+	args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", outfile}
 
 	cmd := exec.Command("ffmpeg", args...)
 
@@ -144,6 +147,8 @@ func main() {
 
 	}
 
+	fmt.Println(green, "Video successfully downloaded as " , outfile, "!", reset)
+
 }
 
 func DLfile(url string, saveas string) {
@@ -156,7 +161,7 @@ func DLfile(url string, saveas string) {
 
 	checkerror(err)
 
-	req.Header.Set("User-Agent", "Mozilla/5.0")
+	req.Header.Set("User-Agent", "Mozilla/5.0") 
 
 	fil, err := new(http.Client).Do(req)
 
