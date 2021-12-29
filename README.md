@@ -8,9 +8,9 @@ Download videos from reddit from the command line.
 
 Example : 
 
-`geddit -u https://www.reddit.com/r/programminghorror/comments/rctjq5/cursed_c_keywords/`
+`geddit -u https://www.reddit.com/r/programminghorror/comments/rctjq5/cursed_c_keywords/ -o helloworld.mp4`
 
-Will download this meme in the current working directory as out.mp4
+Will download this meme in the current working directory as helloworld.mp4
 
 
 # Requirements :

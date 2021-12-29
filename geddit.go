@@ -147,7 +147,7 @@ func main() {
 
 	}
 
-	fmt.Println(green, "Video successfully downloaded as " , outfile, "!", reset)
+	fmt.Println(green, "Video successfully downloaded as ", outfile, "!", reset)
 
 }
 
@@ -161,7 +161,7 @@ func DLfile(url string, saveas string) {
 
 	checkerror(err)
 
-	req.Header.Set("User-Agent", "Mozilla/5.0") 
+	req.Header.Set("User-Agent", "Mozilla/5.0")
 
 	fil, err := new(http.Client).Do(req)
 
