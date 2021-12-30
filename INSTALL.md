@@ -40,7 +40,7 @@ ffmpeg https://ffmpeg.org/download.html
 
 GNU make https://www.gnu.org/software/make/ (Again don't bother it comes with most distros)
 
-Step 1, download release tarball.
+Step 1, download the [latest](https://github.com/Solirs/Gedditsave/releases/tag/Release) release tarball.
 
 Go to the releases on the github repositry and download the release.
 
