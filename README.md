@@ -1,4 +1,4 @@
-# Gedditsave
+# Gettit
 Download videos from reddit from the command line.
 
 
