@@ -13,8 +13,6 @@ Example :
 Will download this meme in the current working directory as helloworld.mp4
 
 
-# Requirements :
+# Install guide
 
-ffmpeg (obligatory)
-
-go (to build from source)
+[Here](https://github.com/Solirs/Gedditsave/blob/main/INSTALL.md)
