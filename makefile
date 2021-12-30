@@ -1,6 +1,6 @@
 build:
-	go build geddit.go
+	go build gettit.go
 
 install:
-	go build geddit.go
-	cp geddit /usr/local/bin
+	go build gettit.go
+	cp gettit /usr/local/bin

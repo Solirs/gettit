@@ -1,4 +1,4 @@
-module geddit
+module gettit
 
 go 1.17
 

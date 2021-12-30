@@ -77,9 +77,9 @@ func Printprogress(path string, total float64){
 		size = 1
 	}
 
-	var percent float64 = float64(size) / float64(total) * 100
+	var percent float64 = float64(size) / float64(total) * 100 //Get the percentage of size to total
 
-	barpercent := math.Ceil(percent / 10) * 10
+	barpercent := math.Ceil(percent / 10) * 10 //Ceil the percentage to 10
 
 
 	var bar string
@@ -87,12 +87,12 @@ func Printprogress(path string, total float64){
 	bar = fmt.Sprint(bar, "[")
 
 
-	for i := 0; i < int(barpercent) / 10; i++{
-		bar = fmt.Sprint(bar, "#")
+	for i := 0; i < int(barpercent) / 5; i++{ 
+		bar = fmt.Sprint(bar, "#") //Fill the loading bar with one # for every 5%
 	}
 
-	for i := 0; i < 9 - (int(barpercent) / 10); i++{
-		bar = fmt.Sprint(bar, " ")
+	for i := 0; i < 20 - int(barpercent) / 5; i++{
+		bar = fmt.Sprint(bar, " ") //And fill the rest with spaces, we want the bar to be 20 wide (excluding the brackets) so we fill the difference between the number of bars we will fill and 20
 	}
 
 	bar = fmt.Sprint(bar, "]")
