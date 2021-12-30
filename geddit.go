@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	humanize "github.com/dustin/go-humanize" //For conversion from bytes to kilobytes megabytes etc..
-	"github.com/tidwall/gjson" //For json parsing
+	"github.com/tidwall/gjson"               //For json parsing
 	"io"
 	"io/ioutil"
 	"log"
@@ -63,8 +63,6 @@ func checkerror(err error) {
 
 }
 
-
-
 func DownloadProgress(total int64, path string) {
 
 	stop := false
@@ -86,8 +84,6 @@ func DownloadProgress(total int64, path string) {
 			}
 
 			var percent float64 = float64(size) / float64(total) * 100
-
-
 
 			percentformat := fmt.Sprintf("%.0f", percent)
 
