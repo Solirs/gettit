@@ -4,11 +4,12 @@ import (
 	"flag"
 	"fmt"
 	humanize "github.com/dustin/go-humanize" //For conversion from bytes to kilobytes megabytes etc..
-	"github.com/tidwall/gjson"               //For json parsing
+	"github.com/tidwall/gjson" //For json parsing
 	"io"
 	"io/ioutil"
 	"log"
 	"math/rand" //For random file names
+	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -63,60 +64,67 @@ func checkerror(err error) {
 
 }
 
+func Printprogress(path string, total float64){
+
+	file, err := os.Open(path)
+	checkerror(err)
+
+	fi, err := file.Stat()
+	checkerror(err)
+	size := fi.Size()
+
+	if size == 0 {
+		size = 1
+	}
+
+	var percent float64 = float64(size) / float64(total) * 100
+
+	barpercent := math.Ceil(percent / 10) * 10
+
+
+	var bar string
+
+	bar = fmt.Sprint(bar, "[")
+
+
+	for i := 0; i < int(barpercent) / 10; i++{
+		bar = fmt.Sprint(bar, "#")
+	}
+
+	for i := 0; i < 9 - (int(barpercent) / 10); i++{
+		bar = fmt.Sprint(bar, " ")
+	}
+
+	bar = fmt.Sprint(bar, "]")
+
+	percentformat := fmt.Sprintf("%.0f", percent)
+
+	fmt.Print(green, "\r", bar, percentformat, "% ", humanize.Bytes(uint64(size)), "/", humanize.Bytes(uint64(total)))
+
+	fmt.Print(reset)
+
+}
+
+
+
 func DownloadProgress(total int64, path string) {
 
 	stop := false
 
-	for {
+	for !stop {
 		switch done {
 		case true:
 			stop = true
-			file, err := os.Open(path)
-			checkerror(err)
 
-			fi, err := file.Stat()
-			checkerror(err)
-
-			size := fi.Size()
-
-			if size == 0 {
-				size = 1
-			}
-
-			var percent float64 = float64(size) / float64(total) * 100
-
-			percentformat := fmt.Sprintf("%.0f", percent)
-
-			fmt.Print(green, "\r", percentformat, "% ", humanize.Bytes(uint64(size)), "/", humanize.Bytes(uint64(total)))
-
-			fmt.Print(reset)
+			Printprogress(path, float64(total))
 
 		default:
 
-			file, err := os.Open(path)
-			checkerror(err)
+			Printprogress(path, float64(total))
 
-			fi, err := file.Stat()
-			checkerror(err)
-			size := fi.Size()
 
-			if size == 0 {
-				size = 1
-			}
-
-			var percent float64 = float64(size) / float64(total) * 100
-			percentformat := fmt.Sprintf("%.0f", percent)
-
-			fmt.Print(green, "\r", percentformat, "% ", humanize.Bytes(uint64(size)), "/", humanize.Bytes(uint64(total)))
-
-			fmt.Print(reset)
 
 		}
-
-		if stop {
-			break
-		}
-
 		time.Sleep(time.Millisecond * 100)
 	}
 }
