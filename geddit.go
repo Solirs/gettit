@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	humanize "github.com/dustin/go-humanize" //For conversion from bytes to kilobytes megabytes etc..
 	"github.com/tidwall/gjson" //For json parsing
 	"io"
 	"io/ioutil"
@@ -12,7 +13,9 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -27,6 +30,8 @@ var videofile string
 var audiofile string
 
 var outfile string
+
+var done bool = false
 
 var red = "\033[31m"
 
@@ -58,6 +63,68 @@ func checkerror(err error) {
 
 }
 
+
+
+func DownloadProgress(total int64, path string) {
+
+	stop := false
+
+	for {
+		switch done {
+		case true:
+			stop = true
+			file, err := os.Open(path)
+			checkerror(err)
+
+			fi, err := file.Stat()
+			checkerror(err)
+
+			size := fi.Size()
+
+			if size == 0 {
+				size = 1
+			}
+
+			var percent float64 = float64(size) / float64(total) * 100
+
+
+
+			percentformat := fmt.Sprintf("%.0f", percent)
+
+			fmt.Print(green, "\r", percentformat, "% ", humanize.Bytes(uint64(size)), "/", humanize.Bytes(uint64(total)))
+
+			fmt.Print(reset)
+
+		default:
+
+			file, err := os.Open(path)
+			checkerror(err)
+
+			fi, err := file.Stat()
+			checkerror(err)
+			size := fi.Size()
+
+			if size == 0 {
+				size = 1
+			}
+
+			var percent float64 = float64(size) / float64(total) * 100
+			percentformat := fmt.Sprintf("%.0f", percent)
+
+			fmt.Print(green, "\r", percentformat, "% ", humanize.Bytes(uint64(size)), "/", humanize.Bytes(uint64(total)))
+
+			fmt.Print(reset)
+
+		}
+
+		if stop {
+			break
+		}
+
+		time.Sleep(time.Millisecond * 100)
+	}
+}
+
 func correcturl() {
 
 	/* This function will attempt to turn the url into a .json*/
@@ -74,7 +141,7 @@ func correcturl() {
 
 func main() {
 
-	fmt.Println("Initializing...")
+	fmt.Println("[+] Initializing...")
 
 	initflags()
 
@@ -84,8 +151,6 @@ func main() {
 		log.Fatal(red, "No post URL specified. Quitting.", reset)
 
 	}
-
-	fmt.Println(strings.TrimSuffix(url, "+"))
 
 	req, err := http.NewRequest("GET", url, nil)
 
@@ -99,7 +164,7 @@ func main() {
 
 	defer resp.Body.Close()
 
-	fmt.Println("Fetching url of the source video file...")
+	fmt.Println("\n[+] Fetching url of the source video file...")
 
 	body, err := ioutil.ReadAll(resp.Body)
 
@@ -109,35 +174,29 @@ func main() {
 
 	checkerror(err)
 
-	fmt.Println(video.String())
+	fmt.Println("\n[+] Downloading source video file...")
 
-	fmt.Println("Downloading source video file...")
+	DLfile(video.String(), "video", Getsize(video.String()))
 
-	DLfile(video.String(), "video")
-
-	fmt.Println("Downloading audio...")
+	fmt.Println("\n[+] Downloading audio...")
 
 	re := regexp.MustCompile(`(?s)\_(.*)\.`)
 
 	m := re.ReplaceAllString(video.String(), "_audio.")
 
-	fmt.Println(m)
+	DLfile(m, "audio", Getsize(m))
 
-	DLfile(m, "audio")
-
-	fmt.Println("Merging audio and video...")
+	fmt.Println("\n[+] Merging audio and video...")
 
 	args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", outfile}
 
 	cmd := exec.Command("ffmpeg", args...)
 
-	fmt.Print(cmd.String(), "\n")
-
 	err = cmd.Run()
 	checkerror(err)
 
 	if !noclean {
-		fmt.Println("\nCleaning...")
+		fmt.Println("\n[+]Cleaning...")
 
 		err = os.Remove(audiofile)
 		checkerror(err)
@@ -147,15 +206,36 @@ func main() {
 
 	}
 
-	fmt.Println(green, "Video successfully downloaded as ", outfile, "!", reset)
+	fmt.Println(green, "\r--Video successfully downloaded as ", outfile, "!--", reset)
 
 }
 
-func DLfile(url string, saveas string) {
+func DLfile(url string, saveas string, size int64) {
+
+	var wg sync.WaitGroup
 
 	/* This function will download an mp4 file and save the file names in a variable to merge them later */
 
+	done = false
+
 	rand.Seed(time.Now().UnixNano())
+
+	RandomName := make([]rune, 10)
+
+	for i := range RandomName {
+
+		RandomName[i] = letterRunes[rand.Intn(len(letterRunes))]
+
+	}
+
+	file, err := os.Create(fmt.Sprint(string(RandomName), ".mp4"))
+	checkerror(err)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		DownloadProgress(size, string(RandomName)+".mp4")
+	}()
 
 	req, err := http.NewRequest("GET", url, nil)
 
@@ -167,25 +247,37 @@ func DLfile(url string, saveas string) {
 
 	checkerror(err)
 
-	RandomName := make([]rune, 10)
-
-	for i := range RandomName {
-
-		RandomName[i] = letterRunes[rand.Intn(len(letterRunes))]
-
-	}
-
-	file, err := os.Create(fmt.Sprint(string(RandomName), ".mp4"))
-
 	checkerror(err)
 
 	_, err = io.Copy(file, fil.Body)
 	checkerror(err)
+
+	done = true
 
 	if saveas == "video" {
 		videofile = string(RandomName) + ".mp4"
 	} else {
 		audiofile = string(RandomName) + ".mp4"
 	}
+
+	wg.Wait()
+
+}
+
+func Getsize(url string) int64 {
+
+	req, err := http.NewRequest("HEAD", url, nil)
+
+	checkerror(err)
+
+	req.Header.Set("User-Agent", "Mozilla/5.0")
+
+	resp, err := new(http.Client).Do(req)
+	checkerror(err)
+
+	size, err := strconv.Atoi(resp.Header.Get("Content-Length"))
+	checkerror(err)
+
+	return int64(size)
 
 }
