@@ -17,7 +17,7 @@ Step 1, clone the repository which contains the source code(aka download it).
 
 Step 2, cd into the downloaded directory.
 
-`cd Gedditsave`
+`cd gettit`
 
 Step 3, run the install command.
 
