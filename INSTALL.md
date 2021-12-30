@@ -34,4 +34,26 @@ Coming soon.
 
 ## Release tarball
 
-Coming soon.
+Requirements :
+
+ffmpeg https://ffmpeg.org/download.html
+
+GNU make https://www.gnu.org/software/make/ (Again don't bother it comes with most distros)
+
+Step 1, download release tarball.
+
+Go to the releases on the github repositry and download the release.
+
+Step 2, extract the tarball and cd into the directory containing the files
+
+`tar -xf Gettit-release-*.tar.gz`
+
+`cd Gettit-release-*`
+
+Step 3, run the install command.
+
+`sudo make install`
+
+Step 4, test.
+
+`gettit -h`
