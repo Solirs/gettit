@@ -2,6 +2,8 @@
 Download videos from reddit from the command line.
 
 
+![screen-gif](https://github.com/Solirs/gettit/blob/main/img/demo.gif)
+
 # Use guide 
 
 `geddit -u post_url`
