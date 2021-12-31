@@ -4,12 +4,12 @@ import (
 	"flag"
 	"fmt"
 	humanize "github.com/dustin/go-humanize" //For conversion from bytes to kilobytes megabytes etc..
-	"github.com/tidwall/gjson" //For json parsing
+	"github.com/tidwall/gjson"               //For json parsing
 	"io"
 	"io/ioutil"
 	"log"
-	"math/rand" //For random file names
 	"math"
+	"math/rand" //For random file names
 	"net/http"
 	"os"
 	"os/exec"
@@ -64,7 +64,7 @@ func checkerror(err error) {
 
 }
 
-func Printprogress(path string, total float64){
+func Printprogress(path string, total float64) {
 
 	file, err := os.Open(path)
 	checkerror(err)
@@ -79,19 +79,17 @@ func Printprogress(path string, total float64){
 
 	var percent float64 = float64(size) / float64(total) * 100 //Get the percentage of size to total
 
-	barpercent := math.Ceil(percent / 10) * 10 //Ceil the percentage to 10
-
+	barpercent := math.Ceil(percent/10) * 10 //Ceil the percentage to 10
 
 	var bar string
 
 	bar = fmt.Sprint(bar, "[")
 
-
-	for i := 0; i < int(barpercent) / 5; i++{ 
+	for i := 0; i < int(barpercent)/5; i++ {
 		bar = fmt.Sprint(bar, "#") //Fill the loading bar with one # for every 5%
 	}
 
-	for i := 0; i < 20 - int(barpercent) / 5; i++{
+	for i := 0; i < 20-int(barpercent)/5; i++ {
 		bar = fmt.Sprint(bar, " ") //And fill the rest with spaces, we want the bar to be 20 wide (excluding the brackets) so we fill the difference between the number of bars we will fill and 20
 	}
 
@@ -104,8 +102,6 @@ func Printprogress(path string, total float64){
 	fmt.Print(reset)
 
 }
-
-
 
 func DownloadProgress(total int64, path string) {
 
@@ -121,8 +117,6 @@ func DownloadProgress(total int64, path string) {
 		default:
 
 			Printprogress(path, float64(total))
-
-
 
 		}
 		time.Sleep(time.Millisecond * 100)
