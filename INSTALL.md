@@ -10,6 +10,12 @@ ffmpeg https://ffmpeg.org/download.html
 
 GNU make https://www.gnu.org/software/make/ (Dont bother too much it should come preinstalled on most linux distros)
 
+You should build from source if :
+
+- You want to make sure your binary was actually built from the source code on the repo
+
+- The binary doesn't work on your OS/Distro.
+
 
 Step 1, clone the repository which contains the source code(aka download it).
 
@@ -39,6 +45,13 @@ Requirements :
 ffmpeg https://ffmpeg.org/download.html
 
 GNU make https://www.gnu.org/software/make/ (Again don't bother it comes with most distros)
+
+You should use a release tarball if:
+
+- You want a quick and easy way to install gettit
+
+- There is no package for your distro
+
 
 Step 1, download the [latest](https://github.com/Solirs/Gedditsave/releases/tag/Release) release tarball.
 
