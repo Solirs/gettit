@@ -9,9 +9,9 @@
 
 `-u [URL] , The URL of the post to download from`
 
-`-o , The name of the 
+`-o , The name of the output file (Optional)`
 
 ### Extras
 
-`-noclean , Don't remove temporary files`
+`-noclean , Don't remove temporary files (Optional)`
 
