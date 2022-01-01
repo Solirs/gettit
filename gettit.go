@@ -174,7 +174,7 @@ func main() {
 
 	fmt.Println("\n[+] Downloading source video file...")
 
-	DLfile(video.String(), "video", Getsize(video.String()))
+	DLvideo(video.String(), "video", Getsize(video.String()))
 
 	fmt.Println("\n[+] Downloading audio...")
 
@@ -182,7 +182,7 @@ func main() {
 
 	m := re.ReplaceAllString(video.String(), "_audio.")
 
-	DLfile(m, "audio", Getsize(m))
+	DLvideo(m, "audio", Getsize(m))
 
 	fmt.Println("\n[+] Merging audio and video...")
 
@@ -208,13 +208,7 @@ func main() {
 
 }
 
-func DLfile(url string, saveas string, size int64) {
-
-	var wg sync.WaitGroup
-
-	/* This function will download an mp4 file and save the file names in a variable to merge them later */
-
-	done = false
+func Generaterandomstring() string{
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -226,13 +220,29 @@ func DLfile(url string, saveas string, size int64) {
 
 	}
 
-	file, err := os.Create(fmt.Sprint(string(RandomName), ".mp4"))
+	return string(RandomName)
+
+
+}
+
+func DLvideo(url string, saveas string, size int64) {
+
+	var wg sync.WaitGroup
+
+	/* This function will download an mp4 file and save the file names in a variable to merge them later */
+
+	done = false
+
+	filename := Generaterandomstring()
+
+
+	file, err := os.Create(fmt.Sprint(filename, ".mp4"))
 	checkerror(err)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		DownloadProgress(size, string(RandomName)+".mp4")
+		DownloadProgress(size, filename +".mp4")
 	}()
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -253,9 +263,9 @@ func DLfile(url string, saveas string, size int64) {
 	done = true
 
 	if saveas == "video" {
-		videofile = string(RandomName) + ".mp4"
+		videofile = string(filename) + ".mp4"
 	} else {
-		audiofile = string(RandomName) + ".mp4"
+		audiofile = string(filename) + ".mp4"
 	}
 
 	wg.Wait()
