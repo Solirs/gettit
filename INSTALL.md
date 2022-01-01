@@ -16,6 +16,8 @@ You should build from source if :
 
 - The binary doesn't work on your OS/Distro.
 
+- You want a 100% up to date build.
+
 
 Step 1, clone the repository which contains the source code(aka download it).
 
