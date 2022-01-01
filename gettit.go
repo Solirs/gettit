@@ -54,7 +54,7 @@ var White = "\033[37m"*/
 
 func initflags() {
 	flag.StringVar(&filetype, "x", "video", "What you want to download [gif, video]")
-	flag.StringVar(&outfile, "o", Generaterandomstring(), "Output file")
+	flag.StringVar(&outfile, "o", "placeholder", "Output file")
 	flag.StringVar(&url, "u", "NONE", "Url of the post")
 	flag.BoolVar(&noclean, "noclean", false, "Don't remove separate audio and video files after merging them")
 	flag.Parse()
@@ -172,7 +172,10 @@ func DLfile(url string, saveas string, size int64) {
 	case "audio":
 		extension = ".mp4"
 	case "gif":
-		extension = ".gif"
+		if outfile == "placeholder"{
+			outfile = Generaterandomstring() +".gif"  	//If you want to use the -o flag you should also specify the extension, so if you use it file extensions won't be automatically handled (or else we would end up wiht file.extension.extension)
+
+		}
 		filename = outfile //Since we only have to download the gif itself and no audio, we don't need temporary files, so we can "directly" name the downloaded file as the output file specified in args.
 	}
 
@@ -240,6 +243,7 @@ func main() {
 
 	initflags()
 
+
 	correcturl()
 
 	if url == "NONE" {
@@ -267,6 +271,10 @@ func main() {
 
 	switch filetype {
 	case "video":
+		if outfile == "placeholder"{
+			outfile = Generaterandomstring() + ".mp4" 		//If you want to use the -o flag you should also specify the extension, so if you use it file extensions won't be automatically handled (or else we would end up wiht file.extension.extension)
+
+		}
 
 		video := gjson.Get(string(body), "0.data.children.0.data.secure_media.reddit_video.fallback_url")
 
@@ -302,7 +310,9 @@ func main() {
 
 		}
 		fmt.Println(green, "\r--Video successfully downloaded as ", outfile, "!--", reset)
+
 	case "gif":
+
 
 		video := gjson.Get(string(body), "0.data.children.0.data.url_overridden_by_dest")
 
