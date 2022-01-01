@@ -55,7 +55,7 @@ You should use a release tarball if:
 - There is no package for your distro
 
 
-Step 1, download the [latest](https://github.com/Solirs/Gedditsave/releases/tag/Release) release tarball.
+Step 1, download the [latest](https://github.com/Solirs/gettit/releases/tag/v1.1.0) release tarball.
 
 Go to the releases on the github repositry and download the release.
 
