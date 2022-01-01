@@ -30,6 +30,8 @@ var videofile string
 
 var audiofile string
 
+var filetype string
+
 var outfile string
 
 var done bool = false
@@ -51,7 +53,8 @@ var Cyan = "\033[36m"
 var White = "\033[37m"*/
 
 func initflags() {
-	flag.StringVar(&outfile, "o", "out.mp4", "Output file")
+	flag.StringVar(&filetype, "x", "video", "What you want to download [gif, video]")
+	flag.StringVar(&outfile, "o", Generaterandomstring(), "Output file")
 	flag.StringVar(&url, "u", "NONE", "Url of the post")
 	flag.BoolVar(&noclean, "noclean", false, "Don't remove separate audio and video files after merging them")
 	flag.Parse()
@@ -86,7 +89,7 @@ func Printprogress(path string, total float64) {
 	bar = fmt.Sprint(bar, "[")
 
 	for i := 0; i < int(barpercent)/5; i++ {
-		bar = fmt.Sprint(bar, "#") //Fill the loading bar with one # for every 5%
+		bar = fmt.Sprint(bar, "#")
 	}
 
 	for i := 0; i < 20-int(barpercent)/5; i++ {
@@ -125,7 +128,7 @@ func DownloadProgress(total int64, path string) {
 
 func correcturl() {
 
-	/* This function will attempt to turn the url into a .json*/
+	/* This function will attempt to turn the url into a .json so you don't have to ;)*/
 
 	if strings.HasSuffix(url, ".json") {
 		return
@@ -134,6 +137,100 @@ func correcturl() {
 		url = url[:len(url)-1]
 		url = fmt.Sprint(url, ".json")
 	}
+
+}
+
+func Generaterandomstring() string {
+
+	rand.Seed(time.Now().UnixNano())
+
+	RandomName := make([]rune, 10)
+
+	for i := range RandomName {
+
+		RandomName[i] = letterRunes[rand.Intn(len(letterRunes))]
+
+	}
+
+	return string(RandomName)
+
+}
+
+func DLfile(url string, saveas string, size int64) {
+
+	/* This function will download an mp4 file and save the file names in a variable to merge them later */
+
+	var wg sync.WaitGroup
+
+	var extension string
+
+	filename := Generaterandomstring()
+
+	switch saveas {
+	case "video":
+		extension = ".mp4"
+	case "audio":
+		extension = ".mp4"
+	case "gif":
+		extension = ".gif"
+		filename = outfile //Since we only have to download the gif itself and no audio, we don't need temporary files, so we can "directly" name the downloaded file as the output file specified in args.
+	}
+
+	done = false
+
+	file, err := os.Create(fmt.Sprint(filename, extension))
+	checkerror(err)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		DownloadProgress(size, filename+extension)
+	}()
+
+	req, err := http.NewRequest("GET", url, nil)
+
+	checkerror(err)
+
+	req.Header.Set("User-Agent", "Mozilla/5.0")
+
+	fil, err := new(http.Client).Do(req)
+
+	checkerror(err)
+
+	checkerror(err)
+
+	_, err = io.Copy(file, fil.Body)
+	checkerror(err)
+
+	done = true
+
+	switch saveas {
+	case "video":
+		videofile = string(filename) + ".mp4"
+
+	case "audio":
+		audiofile = string(filename) + ".mp4"
+	}
+
+	wg.Wait()
+
+}
+
+func Getsize(url string) int64 {
+
+	req, err := http.NewRequest("HEAD", url, nil)
+
+	checkerror(err)
+
+	req.Header.Set("User-Agent", "Mozilla/5.0")
+
+	resp, err := new(http.Client).Do(req)
+	checkerror(err)
+
+	size, err := strconv.Atoi(resp.Header.Get("Content-Length"))
+	checkerror(err)
+
+	return int64(size)
 
 }
 
@@ -168,124 +265,55 @@ func main() {
 
 	checkerror(err)
 
-	video := gjson.Get(string(body), "0.data.children.0.data.secure_media.reddit_video.fallback_url")
+	switch filetype {
+	case "video":
 
-	checkerror(err)
+		video := gjson.Get(string(body), "0.data.children.0.data.secure_media.reddit_video.fallback_url")
 
-	fmt.Println("\n[+] Downloading source video file...")
+		fmt.Println("\n[+] Downloading source video file...")
 
-	DLvideo(video.String(), "video", Getsize(video.String()))
+		DLfile(video.String(), "video", Getsize(video.String()))
 
-	fmt.Println("\n[+] Downloading audio...")
+		fmt.Println("\n[+] Downloading audio...")
 
-	re := regexp.MustCompile(`(?s)\_(.*)\.`)
+		re := regexp.MustCompile(`(?s)\_(.*)\.`)
 
-	m := re.ReplaceAllString(video.String(), "_audio.")
+		m := re.ReplaceAllString(video.String(), "_audio.")
 
-	DLvideo(m, "audio", Getsize(m))
+		DLfile(m, "audio", Getsize(m))
 
-	fmt.Println("\n[+] Merging audio and video...")
+		fmt.Println("\n[+] Merging audio and video...")
 
-	args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", outfile}
+		args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", outfile}
 
-	cmd := exec.Command("ffmpeg", args...)
+		cmd := exec.Command("ffmpeg", args...)
 
-	err = cmd.Run()
-	checkerror(err)
-
-	if !noclean {
-		fmt.Println("\n[+]Cleaning...")
-
-		err = os.Remove(audiofile)
+		err = cmd.Run()
 		checkerror(err)
 
-		err = os.Remove(videofile)
-		checkerror(err)
+		if !noclean {
+			fmt.Println("\n[+]Cleaning...")
+
+			err = os.Remove(audiofile)
+			checkerror(err)
+
+			err = os.Remove(videofile)
+			checkerror(err)
+
+		}
+		fmt.Println(green, "\r--Video successfully downloaded as ", outfile, "!--", reset)
+	case "gif":
+
+		video := gjson.Get(string(body), "0.data.children.0.data.url_overridden_by_dest")
+
+		fmt.Println("\n[+] Downloading GIF...")
+		DLfile(video.String(), "gif", Getsize(video.String()))
+
+		fmt.Println(green, "\r--GIF successfully downloaded as ", outfile, "!--", reset)
+
+	default:
+		log.Fatal(red, `Invalid file type specified, please choose "video" or "gif"`, reset)
 
 	}
-
-	fmt.Println(green, "\r--Video successfully downloaded as ", outfile, "!--", reset)
-
-}
-
-func Generaterandomstring() string{
-
-	rand.Seed(time.Now().UnixNano())
-
-	RandomName := make([]rune, 10)
-
-	for i := range RandomName {
-
-		RandomName[i] = letterRunes[rand.Intn(len(letterRunes))]
-
-	}
-
-	return string(RandomName)
-
-
-}
-
-func DLvideo(url string, saveas string, size int64) {
-
-	var wg sync.WaitGroup
-
-	/* This function will download an mp4 file and save the file names in a variable to merge them later */
-
-	done = false
-
-	filename := Generaterandomstring()
-
-
-	file, err := os.Create(fmt.Sprint(filename, ".mp4"))
-	checkerror(err)
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		DownloadProgress(size, filename +".mp4")
-	}()
-
-	req, err := http.NewRequest("GET", url, nil)
-
-	checkerror(err)
-
-	req.Header.Set("User-Agent", "Mozilla/5.0")
-
-	fil, err := new(http.Client).Do(req)
-
-	checkerror(err)
-
-	checkerror(err)
-
-	_, err = io.Copy(file, fil.Body)
-	checkerror(err)
-
-	done = true
-
-	if saveas == "video" {
-		videofile = string(filename) + ".mp4"
-	} else {
-		audiofile = string(filename) + ".mp4"
-	}
-
-	wg.Wait()
-
-}
-
-func Getsize(url string) int64 {
-
-	req, err := http.NewRequest("HEAD", url, nil)
-
-	checkerror(err)
-
-	req.Header.Set("User-Agent", "Mozilla/5.0")
-
-	resp, err := new(http.Client).Do(req)
-	checkerror(err)
-
-	size, err := strconv.Atoi(resp.Header.Get("Content-Length"))
-	checkerror(err)
-
-	return int64(size)
 
 }
