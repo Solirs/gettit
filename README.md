@@ -15,6 +15,8 @@ Example :
 Will download this meme in the current working directory as helloworld.mp4
 
 
-# Install guide
+# Documentation
 
-[Here](https://github.com/Solirs/Gedditsave/blob/main/INSTALL.md)
+[Install guide](https://github.com/Solirs/Gedditsave/blob/main/INSTALL.md)
+
+[Use guide](https://github.com/Solirs/Gedditsave/blob/main/USE.md)
