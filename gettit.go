@@ -36,6 +36,10 @@ var outfile string
 
 var done bool = false
 
+var noaudio bool
+
+var novideo bool
+
 var red = "\033[31m"
 
 var reset = "\033[0m"
@@ -52,12 +56,21 @@ var Cyan = "\033[36m"
 
 var White = "\033[37m"*/
 
-func initflags() {
+func initg() {
 	flag.StringVar(&filetype, "x", "video", "What you want to download [gif, video]")
 	flag.StringVar(&outfile, "o", "placeholder", "Output file")
 	flag.StringVar(&url, "u", "NONE", "Url of the post")
 	flag.BoolVar(&noclean, "noclean", false, "Don't remove separate audio and video files after merging them")
+	flag.BoolVar(&noaudio, "noaudio", false, "Don't download audio, just video")
+	flag.BoolVar(&novideo, "novideo", false, "Don't download video, just audio")
 	flag.Parse()
+
+	if noaudio {
+		noclean = true //You dont need to clean if no tempfiles are created to be merged right ?
+	} else if novideo {
+		noclean = true
+	}
+
 }
 
 func checkerror(err error) {
@@ -219,6 +232,17 @@ func DLfile(url string, saveas string, size int64) {
 
 }
 
+func Mergeaudioandvideo() {
+	fmt.Println("\n[+] Merging audio and video...")
+
+	args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", outfile}
+
+	cmd := exec.Command("ffmpeg", args...)
+
+	err := cmd.Run()
+	checkerror(err)
+}
+
 func Getsize(url string) int64 {
 
 	req, err := http.NewRequest("HEAD", url, nil)
@@ -241,7 +265,7 @@ func main() {
 
 	fmt.Println("[+] Initializing...")
 
-	initflags()
+	initg()
 
 	correcturl()
 
@@ -277,34 +301,53 @@ func main() {
 
 		video := gjson.Get(string(body), "0.data.children.0.data.secure_media.reddit_video.fallback_url")
 
-		fmt.Println("\n[+] Downloading source video file...")
+		if !novideo {
 
-		DLfile(video.String(), "video", Getsize(video.String()))
+			fmt.Println("\n[+] Downloading source video file...")
 
-		fmt.Println("\n[+] Downloading audio...")
+			DLfile(video.String(), "video", Getsize(video.String()))
 
-		re := regexp.MustCompile(`(?s)\_(.*)\.`)
+		}
 
-		m := re.ReplaceAllString(video.String(), "_audio.")
+		if !noaudio {
 
-		DLfile(m, "audio", Getsize(m))
+			fmt.Println("\n[+] Downloading audio...")
 
-		fmt.Println("\n[+] Merging audio and video...")
+			re := regexp.MustCompile(`(?s)\_(.*)\.`)
 
-		args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", outfile}
+			m := re.ReplaceAllString(video.String(), "_audio.")
 
-		cmd := exec.Command("ffmpeg", args...)
+			DLfile(m, "audio", Getsize(m))
 
-		err = cmd.Run()
-		checkerror(err)
+		}
+
+		if !noaudio && !novideo {
+
+			Mergeaudioandvideo()
+
+		} else {
+			if noaudio {
+
+				err = os.Rename(videofile, outfile)
+				checkerror(err)
+
+			}
+			if novideo {
+
+				err = os.Rename(audiofile, outfile)
+				checkerror(err)
+
+			}
+
+		}
 
 		if !noclean {
 			fmt.Println("\n[+]Cleaning...")
 
-			err = os.Remove(audiofile)
+			err = os.Remove(videofile)
 			checkerror(err)
 
-			err = os.Remove(videofile)
+			err = os.Remove(audiofile)
 			checkerror(err)
 
 		}

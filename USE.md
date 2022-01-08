@@ -15,3 +15,8 @@
 
 `-noclean , Don't remove temporary files (Optional)`
 
+`-novideo , Don't download the video, just audio (Optional)`
+
+`-noaudio , Don't download the audio, just video (Optional)`
+
+
