@@ -4,7 +4,7 @@ Download videos from reddit from the command line.
 
 ![screen-gif](https://github.com/Solirs/gettit/blob/main/img/demo.gif)
 
-# Use guide 
+# Very quick Use guide 
 
 `gettit -u post_url`
 
@@ -19,4 +19,4 @@ Will download this meme in the current working directory as helloworld.mp4
 
 [Install guide](https://github.com/Solirs/Gedditsave/blob/main/INSTALL.md)
 
-[Use guide](https://github.com/Solirs/Gedditsave/blob/main/USE.md)
+[Full use guide](https://github.com/Solirs/Gedditsave/blob/main/USE.md)
