@@ -1,10 +1,9 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
-	humanize "github.com/dustin/go-humanize" //For conversion from bytes to kilobytes megabytes etc..
-	"github.com/tidwall/gjson"               //For json parsing
 	"io"
 	"io/ioutil"
 	"log"
@@ -18,6 +17,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	humanize "github.com/dustin/go-humanize" //For conversion from bytes to kilobytes megabytes etc..
+	"github.com/tidwall/gjson"               //For json parsing
 )
 
 var url string
@@ -172,7 +174,6 @@ func Generaterandomstring() string {
 func DLfile(url string, saveas string, size int64) {
 
 	/* This function will download an mp4 file and save the file names in a variable to merge them later */
-
 	var wg sync.WaitGroup
 
 	var extension string
@@ -196,7 +197,6 @@ func DLfile(url string, saveas string, size int64) {
 
 	file, err := os.Create(fmt.Sprint(filename, extension))
 	checkerror(err)
-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -207,7 +207,7 @@ func DLfile(url string, saveas string, size int64) {
 
 	checkerror(err)
 
-	req.Header.Set("User-Agent", "Mozilla/5.0")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:107.0) Gecko/20100101 Firefox/107.0")
 
 	fil, err := new(http.Client).Do(req)
 
@@ -276,11 +276,18 @@ func main() {
 
 	req, err := http.NewRequest("GET", url, nil)
 
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{},
+		},
+	}
+
 	checkerror(err)
 
-	req.Header.Set("User-Agent", "Mozilla/5.0") //We need a semi-credible user agent or else reddit will just block the request
+	req.Header.Set("accept", "*/*")
+	req.Header.Set("user-agent", "Mozilla/5.0 (X11; Linux x86_64; rv:107.0) Gecko/20100101 Firefox/107.0") //We need a semi-credible user agent or else reddit will just block the request
 
-	resp, err := new(http.Client).Do(req)
+	resp, err := client.Do(req)
 
 	checkerror(err)
 
@@ -304,6 +311,8 @@ func main() {
 		if !novideo {
 
 			fmt.Println("\n[+] Downloading source video file...")
+
+			fmt.Print(video)
 
 			DLfile(video.String(), "video", Getsize(video.String()))
 
