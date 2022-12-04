@@ -20,3 +20,11 @@ Will download this meme in the current working directory as helloworld.mp4
 [Install guide](https://github.com/Solirs/Gedditsave/blob/main/INSTALL.md)
 
 [Full use guide](https://github.com/Solirs/Gedditsave/blob/main/USE.md)
+
+# Help this project
+
+- Send me your good vibes at iusegentoobtw@protonmail.com, knowing people actually use and like this is my biggest motivator.
+
+- Contribute code, this project is very open to PRs and ill gladly merge them.
+
+- Send feedback. Anything this project misses? Any bug? Any suggestion? Open an issue.
