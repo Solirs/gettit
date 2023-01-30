@@ -1,3 +1,5 @@
+# THE SOURCE IN THIS BRANCH IS LICENSED UNDER THE UNLICENSE LICENSE, UNLIKE THE SOURCE CODE IN THE MAIN BRANCH.
+
 # Gettit
 Download videos from reddit from the command line.
 
