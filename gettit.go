@@ -82,6 +82,22 @@ func checkerror(err error) {
 
 }
 
+func Promptoverwrite(file string) {
+	var answer string
+	fmt.Printf("\nFile %s already exists, overwrite? [y/n]: ", file)
+	fmt.Scanln(&answer)
+
+	answer = strings.ToLower(answer)
+	if answer == "y" || answer == "yes" {
+		os.Remove(file)
+	} else {
+		fmt.Println("Aborting")
+		os.Remove(videofile)
+		os.Remove(audiofile)
+		os.Exit(0)
+	}
+}
+
 func Printprogress(path string, total float64) {
 
 	file, err := os.Open(path)
@@ -191,6 +207,10 @@ func DLfile(url string, saveas string, size int64) {
 
 		}
 		filename = outfile //Since we only have to download the gif itself and no audio, we don't need temporary files, so we can "directly" name the downloaded file as the output file specified in args.
+		_, err := os.Stat(outfile)
+		if err == nil {
+			Promptoverwrite(outfile)
+		}
 	}
 
 	done = false
@@ -237,20 +257,7 @@ func Mergeaudioandvideo() {
 
 	_, err := os.Stat(outfile)
 	if err == nil {
-		var answer string
-		fmt.Printf("\nFile %s already exists, overwrite? [y/n]: ", outfile)
-		fmt.Scanln(&answer)
-
-		answer = strings.ToLower(answer)
-		if answer == "y" || answer == "yes" {
-			os.Remove(outfile)
-		} else {
-			fmt.Println("Aborting")
-			os.Remove(videofile)
-			os.Remove(audiofile)
-			os.Exit(0)
-		}
-
+		Promptoverwrite(outfile)
 	}
 
 	args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", outfile}
