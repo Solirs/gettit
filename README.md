@@ -28,3 +28,8 @@ Will download this meme in the current working directory as helloworld.mp4
 - Contribute code, this project is very open to PRs and ill gladly merge them.
 
 - Send feedback. Anything this project misses? Any bug? Any suggestion? Open an issue.
+
+# Relicensing notice
+On Monday January the 30th this project was relicensed to the Gplv3 license.
+You can still find the source code before the relicensing, under the unlicense license, in the pre_relicense branch.
+However the code in the main branch is now licensed under the GPLV3 License.
