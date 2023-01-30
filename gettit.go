@@ -235,11 +235,29 @@ func DLfile(url string, saveas string, size int64) {
 func Mergeaudioandvideo() {
 	fmt.Println("\n[+] Merging audio and video...")
 
+	_, err := os.Stat(outfile)
+	if err == nil {
+		var answer string
+		fmt.Printf("\nFile %s already exists, overwrite? [y/n]: ", outfile)
+		fmt.Scanln(&answer)
+
+		answer = strings.ToLower(answer)
+		if answer == "y" || answer == "yes" {
+			os.Remove(outfile)
+		} else {
+			fmt.Println("Aborting")
+			os.Remove(videofile)
+			os.Remove(audiofile)
+			os.Exit(0)
+		}
+
+	}
+
 	args := []string{"-i", videofile, "-i", audiofile, "-c:v", "copy", "-c:a", "aac", outfile}
 
 	cmd := exec.Command("ffmpeg", args...)
 
-	err := cmd.Run()
+	err = cmd.Run()
 	checkerror(err)
 }
 
