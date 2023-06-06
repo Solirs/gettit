@@ -3,6 +3,9 @@ DUE TO REDDIT API CHANGES THIS WILL NO LONGER WORK AFTER JULY THE FIRST 2023.
 I will not add support for using your own API key because i dont want to encourage people to give reddit money after this. Writing this was fun and thanks everyone for your kind comments.  
 See you on another project!  And if you use reddit consider trying out [Lemmy](https://join-lemmy.org/).  
 
+P.S: 
+It may be possible to rewrite this in a way that makes use of webscraping, i will almost no longer use reddit after all this so i sadly wont be the one writing it.  
+
 Download videos from reddit from the command line.
 
 
