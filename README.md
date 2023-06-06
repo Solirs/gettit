@@ -1,7 +1,7 @@
 # Gettit
 DUE TO REDDIT API CHANGES THIS WILL NO LONGER WORK AFTER JULY THE FIRST 2023.
 I will not add support for using your own API key because i dont want to encourage people to give reddit money after this. Writing this was fun and thanks everyone for your kind comments.  
-See you on another project!  
+See you on another project!  And if you use reddit consider trying out [Lemmy](https://join-lemmy.org/).  
 
 Download videos from reddit from the command line.
 
