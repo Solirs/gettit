@@ -6,7 +6,7 @@ Reddit has lost my respect as a platform and i will move on from this, anyone is
 See you on another project!  And if you use reddit consider trying out [Lemmy](https://join-lemmy.org/) (who knows i may write a similar tool for it one day).
 
 P.S: 
-It may be possible to rewrite this in a way that makes use of webscraping, i will almost no longer use reddit after all this so i sadly wont be the one writing it.  
+It may be possible to rewrite this in a way that makes use of webscraping, i will almost no longer use reddit after all this so i sadly wont be the one writing it.  This repo will be archived if it becomes clear reddit will never come back on this decision (it might already be)
 
 Download videos from reddit from the command line.
 
